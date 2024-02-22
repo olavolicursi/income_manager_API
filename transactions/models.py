@@ -8,6 +8,7 @@ TRANSACTION_TYPE_CHOICES = (
     ('D', 'D')
 )
 
+
 class Transaction(models.Model):
     account = models.ForeignKey(Account, on_delete=models.CASCADE)
     value = models.FloatField()

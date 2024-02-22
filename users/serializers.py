@@ -13,7 +13,7 @@ class UserSerializer(serializers.ModelSerializer):
         # Use make_password para criptografar a senha antes de salvar no banco de dados
         validated_data['password'] = make_password(validated_data['password'])
         return super(UserSerializer, self).create(validated_data)
-    
+
     def update(self, instance, validated_data):
         # Se a senha foi incluída na atualização, criptografe-a antes de salvar
         if 'password' in validated_data:
