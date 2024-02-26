@@ -6,11 +6,9 @@ from django.utils import timezone
 from transactions.models import Transaction
 
 
-
-
 @receiver(post_save, sender=Transaction)
 def update_account_balance(sender, instance, **kwargs):
-    if instance.payment_date <= timezone.now().date():
+    if instance.payment_date.date() <= timezone.now().date():
         account_id = instance.account_id
         if instance.type == "D":
             account_id.balance -= instance.value
