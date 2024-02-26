@@ -1,12 +1,33 @@
 from django.db.models.signals import post_save, post_delete
 from django.dispatch import receiver
 from django.utils import timezone
-from celery import shared_task
-from accounts.models import Account
+# from celery import shared_task
+# from accounts.models import Account
 from transactions.models import Transaction
 
 
-# @shared_task
+
+
+@receiver(post_save, sender=Transaction)
+def update_account_balance(sender, instance, **kwargs):
+    if instance.payment_date <= timezone.now().date():
+        account_id = instance.account_id
+        if instance.type == "D":
+            account_id.balance -= instance.value
+        elif instance.type == "C":
+            account_id.balance += instance.value
+        account_id.save()
+
+@receiver(post_delete, sender=Transaction)
+def delete_account_balance(sender, instance, **kwargs):
+    account_id = instance.account_id
+    if instance.type == "D":
+        account_id.balance += instance.value
+    elif instance.type == "C":
+        account_id.balance -= instance.value
+    account_id.save()
+
+    # @shared_task
 # def update_account_balance_async(account, value, type):
 #     account = Account.objects.get(pk=account)
 #     if type == "D":
@@ -35,21 +56,3 @@ from transactions.models import Transaction
 #     else:
 #         # A data de pagamento é hoje ou passada, executar imediatamente
 #         update_account_balance_async(account, value, type)
-
-@receiver(post_save, sender=Transaction)
-def update_account_balance(sender, instance, **kwargs):
-    account_id = instance.account_id
-    if instance.type == "D":
-        account_id.balance -= instance.value
-    elif instance.type == "C":
-        account_id.balance += instance.value
-    account_id.save()
-
-@receiver(post_delete, sender=Transaction)
-def delete_account_balance(sender, instance, **kwargs):
-    account_id = instance.account_id
-    if instance.type == "D":
-        account_id.balance += instance.value
-    elif instance.type == "C":
-        account_id.balance -= instance.value
-    account_id.save()
