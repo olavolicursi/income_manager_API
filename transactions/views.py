@@ -1,4 +1,5 @@
 from rest_framework import generics
+from rest_framework.permissions import IsAuthenticated
 from transactions.models import Transaction
 from transactions.serializers import TransactionSerializer, TransactionListDetailSerializer
 from django_filters import rest_framework as filters
@@ -14,25 +15,19 @@ class TransactionFilter(filters.FilterSet):
 
 
 class TransactionCreateListView(generics.ListCreateAPIView):
-    # permission_classes = (IsAuthenticated, GlobalDefaultPermission,)
+    permission_classes = (IsAuthenticated,)
     queryset = Transaction.objects.all()
     serializer_class = TransactionSerializer
-    # filterset_class = TransactionFilter
+    filterset_class = TransactionFilter
 
     def get_serializer_class(self):
         if self.request.method == 'GET':
             return TransactionListDetailSerializer
         return TransactionSerializer
 
-    # def get_permissions(self):
-    #     if self.request.method == 'POST':
-    #         # Exigir autenticação para solicitações POST
-    #         return [permissions.IsAuthenticated()]
-    #     return super().get_permissions()
-
 
 class TransactionListFilter(generics.ListAPIView):
-    # permission_classes = (IsAuthenticated,)
+    permission_classes = (IsAuthenticated,)
     serializer_class = TransactionListDetailSerializer
 
     def get_queryset(self):
@@ -41,6 +36,6 @@ class TransactionListFilter(generics.ListAPIView):
 
 
 class TransactionRetrieveUpdateDestroyView(generics.RetrieveUpdateDestroyAPIView):
-    # permission_classes = (IsAuthenticated, GlobalDefaultPermission,)
+    permission_classes = (IsAuthenticated,)
     queryset = Transaction.objects.all()
     serializer_class = TransactionSerializer
