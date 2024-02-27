@@ -10,6 +10,7 @@ class TransactionSerializer(serializers.ModelSerializer):
         model = Transaction
         fields = '__all__'
 
+
 class TransactionListDetailSerializer(serializers.ModelSerializer):
     account_id = AccountSerializer()
     category_id = CategorySerializer()

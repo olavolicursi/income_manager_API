@@ -8,13 +8,15 @@ from transactions.models import Transaction
 
 @receiver(post_save, sender=Transaction)
 def update_account_balance(sender, instance, **kwargs):
-    if instance.payment_date.date() <= timezone.now().date():
-        account_id = instance.account_id
-        if instance.type == "D":
-            account_id.balance -= instance.value
-        elif instance.type == "C":
-            account_id.balance += instance.value
-        account_id.save()
+    if instance.payment_date is not None:
+        if instance.payment_date <= timezone.now().date():
+            account_id = instance.account_id
+            if instance.type == "D":
+                account_id.balance -= instance.value
+            elif instance.type == "C":
+                account_id.balance += instance.value
+            account_id.save()
+
 
 @receiver(post_delete, sender=Transaction)
 def delete_account_balance(sender, instance, **kwargs):
