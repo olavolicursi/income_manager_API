@@ -1,3 +1,5 @@
+from django.utils import timezone
+from django.db.models import Q
 from rest_framework import generics
 from rest_framework.permissions import IsAuthenticated
 from transactions.models import Transaction
@@ -38,4 +40,16 @@ class TransactionListFilter(generics.ListAPIView):
 class TransactionRetrieveUpdateDestroyView(generics.RetrieveUpdateDestroyAPIView):
     permission_classes = (IsAuthenticated,)
     queryset = Transaction.objects.all()
+    serializer_class = TransactionSerializer
+
+
+class TransactionListToReceive(generics.ListAPIView):
+    
+    permission_classes = (IsAuthenticated,)
+    queryset = Transaction.objects.filter((Q(payment_date__gt=timezone.now()) | Q(payment_date__isnull=True)) & Q(type='C'))
+    serializer_class = TransactionSerializer
+
+class TransactionListToSwitchOff(generics.ListAPIView):
+    permission_classes = (IsAuthenticated,)
+    queryset = Transaction.objects.filter(Q(payment_date__lte=timezone.now()) & Q(type='D'))
     serializer_class = TransactionSerializer
