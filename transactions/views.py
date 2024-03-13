@@ -22,6 +22,7 @@ class TransactionCreateListView(generics.ListCreateAPIView):
     serializer_class = TransactionSerializer
     filterset_class = TransactionFilter
 
+#teste
     def get_serializer_class(self):
         if self.request.method == 'GET':
             return TransactionListDetailSerializer
